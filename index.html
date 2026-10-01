@@ -94,14 +94,27 @@ body {
 <link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+html, body { position: fixed; top: 0; left: 0; right: 0; bottom: 0; margin: 0; padding: 0; overflow: hidden; overscroll-behavior: none; background: #020308; }
+#gg-safe { position: fixed; left: 0; top: 0; width: 0; height: 0; visibility: hidden; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+</style>
 <script>
-// iPhone/iPad (Home-Bildschirm): Die Fenstergröße stimmt beim Start oft erst nach einem Moment.
-// Ein paar späte resize-Signale lassen Godot das Bild auf die echte Größe ziehen.
-function ggResize(){ window.dispatchEvent(new Event("resize")); }
-window.addEventListener("load", function(){ [200, 600, 1200, 2500].forEach(function(t){ setTimeout(ggResize, t); }); });
-window.addEventListener("orientationchange", function(){ setTimeout(ggResize, 300); setTimeout(ggResize, 900); });
-window.addEventListener("pageshow", function(){ setTimeout(ggResize, 300); });
+// iPhone/iPad als Home-Bildschirm-App: ganzer Bildschirm (auch unter der Statusleiste), Seite darf nicht scrollen.
+var ggVp = document.querySelector("meta[name=viewport]");
+if (ggVp) { ggVp.setAttribute("content", "width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover"); }
+// Sichere Ränder (Kamera-Aussparung) messen; das Spiel liest window.ggSafe und rückt die Seitenleisten ein.
+function ggMeasureSafe() {
+  var el = document.getElementById("gg-safe");
+  if (!el) { el = document.createElement("div"); el.id = "gg-safe"; document.body.appendChild(el); }
+  var cs = getComputedStyle(el);
+  window.ggSafe = { l: parseFloat(cs.paddingLeft) || 0, r: parseFloat(cs.paddingRight) || 0, t: parseFloat(cs.paddingTop) || 0, b: parseFloat(cs.paddingBottom) || 0, h: window.innerHeight };
+}
+function ggResize() { window.scrollTo(0, 0); ggMeasureSafe(); window.dispatchEvent(new Event("resize")); }
+window.addEventListener("load", function () { ggMeasureSafe(); [200, 600, 1200, 2500].forEach(function (t) { setTimeout(ggResize, t); }); });
+window.addEventListener("orientationchange", function () { setTimeout(ggResize, 300); setTimeout(ggResize, 900); });
+window.addEventListener("pageshow", function () { setTimeout(ggResize, 300); });
+if (window.visualViewport) { window.visualViewport.addEventListener("resize", function () { window.scrollTo(0, 0); ggMeasureSafe(); }); }
 </script>
 	</head>
 	<body>
@@ -121,7 +134,7 @@ window.addEventListener("pageshow", function(){ setTimeout(ggResize, 300); });
 
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":2587188,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":2587732,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
