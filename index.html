@@ -92,7 +92,17 @@ body {
 		</style>
 		<link id="-gd-engine-icon" rel="icon" type="image/png" href="index.icon.png" />
 <link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
-
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<script>
+// iPhone/iPad (Home-Bildschirm): Die Fenstergröße stimmt beim Start oft erst nach einem Moment.
+// Ein paar späte resize-Signale lassen Godot das Bild auf die echte Größe ziehen.
+function ggResize(){ window.dispatchEvent(new Event("resize")); }
+window.addEventListener("load", function(){ [200, 600, 1200, 2500].forEach(function(t){ setTimeout(ggResize, t); }); });
+window.addEventListener("orientationchange", function(){ setTimeout(ggResize, 300); setTimeout(ggResize, 900); });
+window.addEventListener("pageshow", function(){ setTimeout(ggResize, 300); });
+</script>
 	</head>
 	<body>
 		<canvas id="canvas">
