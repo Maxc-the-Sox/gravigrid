@@ -10,3 +10,5 @@ Steuerung: Maus, Controller oder Touch (iPad/iPhone; am iPhone ist die Schrift n
 Dev.: Johannes K aka Maxc the Sox
 
 Schriften (nur Web-Version): Barlow, DejaVu Sans, Noto Emoji – Lizenzen in `font-licenses/`.
+
+Musik (`music/`): 5 Titel, erstellt mit Google Gemini (KI) – Drifting Near the Moon, Glass Tides, Midnight Orbit, Weightless In The Deep, Weightless Passage.
