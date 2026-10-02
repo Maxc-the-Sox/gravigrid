@@ -117,6 +117,41 @@ window.addEventListener("load", function () { ggMeasureSafe(); [200, 600, 1200, 
 window.addEventListener("orientationchange", function () { setTimeout(ggResize, 300); setTimeout(ggResize, 900); });
 window.addEventListener("pageshow", function () { setTimeout(ggResize, 300); });
 if (window.visualViewport) { window.visualViewport.addEventListener("resize", function () { window.scrollTo(0, 0); ggMeasureSafe(); }); }
+// Hintergrundmusik: der Browser streamt music/*.mp3 selbst (zwei Decks zum Überblenden, Lautstärke per Web Audio,
+// weil iPhone die Lautstärke von <audio> ignoriert). Start erst nach dem ersten Tippen/Klick (Autoplay-Regel).
+window.ggMusic = (function () {
+  var ctx = null, decks = [];
+  function ensure() {
+    if (ctx) { return; }
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    for (var i = 0; i < 2; i++) {
+      var a = new Audio(); a.preload = 'auto';
+      var g = ctx.createGain(); g.gain.value = 0;
+      ctx.createMediaElementSource(a).connect(g); g.connect(ctx.destination);
+      decks.push({ a: a, g: g, want: false });
+    }
+  }
+  function unlock() {
+    ensure();
+    if (ctx.state !== 'running') { ctx.resume(); }
+    decks.forEach(function (d) { if (d.want && d.a.paused) { d.a.play().catch(function () {}); } });
+  }
+  ['pointerup', 'touchend', 'click', 'keydown'].forEach(function (e) { document.addEventListener(e, unlock, true); });
+  document.addEventListener('visibilitychange', function () {
+    if (!ctx) { return; }
+    if (document.hidden) { ctx.suspend(); } else { ctx.resume(); }
+  });
+  return {
+    load: function (i, url) { ensure(); decks[i].a.src = url; decks[i].a.load(); },
+    play: function (i) { ensure(); var d = decks[i]; d.want = true; d.a.currentTime = 0; d.a.play().catch(function () {}); },
+    stop: function (i) { ensure(); decks[i].want = false; decks[i].a.pause(); },
+    gain: function (i, v) { ensure(); decks[i].g.gain.value = v; },
+    pos: function (i) { ensure(); return decks[i].a.currentTime || 0; },
+    dur: function (i) { ensure(); var x = decks[i].a.duration; return isFinite(x) ? x : 0; },
+    playing: function (i) { ensure(); var a = decks[i].a; return !a.paused && !a.ended; },
+    running: function () { return !!ctx && ctx.state === 'running'; }
+  };
+})();
 </script>
 	</head>
 	<body>
@@ -136,7 +171,7 @@ if (window.visualViewport) { window.visualViewport.addEventListener("resize", fu
 
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":2614868,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":2621200,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
