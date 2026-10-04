@@ -105,6 +105,9 @@ html, body, canvas { -webkit-touch-callout: none; -webkit-user-select: none; use
 // iPhone/iPad als Home-Bildschirm-App: ganzer Bildschirm (auch unter der Statusleiste), Seite darf nicht scrollen.
 var ggVp = document.querySelector("meta[name=viewport]");
 if (ggVp) { ggVp.setAttribute("content", "width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover"); }
+// iPhone/iPad: höchstens 2 Bildpunkte je CSS-Pixel rendern statt 3 – spart über die Hälfte Grafikspeicher.
+// Safari lädt die Seite neu, wenn ihr der Speicher ausgeht (Meldung 0.29.2: Spiel lädt einfach neu).
+(function () { var r = window.devicePixelRatio || 1; if (r > 2 && navigator.maxTouchPoints > 0) { try { Object.defineProperty(window, "devicePixelRatio", { get: function () { return 2; }, configurable: true }); } catch (e) {} } })();
 // Sichere Ränder (Kamera-Aussparung) messen; das Spiel liest window.ggSafe und rückt die Seitenleisten ein.
 function ggMeasureSafe() {
   var el = document.getElementById("gg-safe");
@@ -171,7 +174,7 @@ window.ggMusic = (function () {
 
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":2693728,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":2732336,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
